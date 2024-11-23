@@ -23,6 +23,7 @@ Retrieving `np_token`: A quick guide to find your `np_token`:
      localStorage.getItem('np_token');
      ```
 - The value displayed is your `np_token`.
+- Save `np_token` to `tokens.txt`
 
 ## Installation
 
