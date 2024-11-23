@@ -6,4 +6,3 @@ loguru
 pyfiglet
 python-dateutil
 termcolor
-requests
