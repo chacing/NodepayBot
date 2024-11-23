@@ -3,7 +3,7 @@ asyncio
 cloudscraper
 fake-useragent
 loguru
-proxies
 pyfiglet
 python-dateutil
 termcolor
+requests
