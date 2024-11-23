@@ -31,6 +31,17 @@ Retrieving `np_token`: A quick guide to find your `np_token`:
 
 ---
 
+## Setup
+**Clone this repository:**
+   ```bash
+   git clone https://github.com/Enukio/NodepayBot.git
+   ```
+   ```bash
+   cd NodepayBot
+   ```
+   
+---
+
 ## Requirements
 
 Ensure you have Python 3.8 or newer installed.
@@ -52,26 +63,10 @@ Dependencies include:
 
 ---
 
-## Setup
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Enukio/NodepayBot.git
-   ```
-   ```bash
-   cd NodepayBot
-   ```
-
-2. Place your API tokens in a file named `tokens.txt` (one token per line).
-
-3. If using proxies, create a file named `proxy.txt` and list your proxies (one per line).
-
----
-
 ## Usage
 1. **Prepare Configuration Files:**
    - **`tokens.txt`:** A list of tokens for API authentication. One token per line.
-   - **`proxies.txt` (optional):** A list of proxies in the format `protocol://user:pass@host:port`. One proxy per line.
+   - **`proxies.txt` (optional):** A list of proxies in the format `protocol://user:pass@host:port`. One per line.
 
 2. **Run the Script:**
 ```bash
