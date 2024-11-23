@@ -35,6 +35,7 @@ The Nodepay Ping Utility is an asynchronous Python-based tool designed to send p
 
 2. **Generate Proxy List (Optional):**
    - Run `getproxies.py` to download and save free proxies:
+
      ```bash
      python getproxies.py
      ```
