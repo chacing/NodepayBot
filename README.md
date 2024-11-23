@@ -49,7 +49,6 @@ Dependencies include:
 - [pyfiglet](https://pypi.org/project/pyfiglet/)
 - [python-dateutil](https://pypi.org/project/python-dateutil/)
 - [termcolor](https://pypi.org/project/termcolor/)
-- [requests](https://docs.python-requests.org/) (for `getproxies.py`)
 
 ---
 
@@ -72,18 +71,9 @@ Dependencies include:
 ## Usage
 1. **Prepare Configuration Files:**
    - **`tokens.txt`:** A list of tokens for API authentication. One token per line.
-   - **`proxies.txt` (optional):** A list of proxies in the format `type://user:password@host:port` or `type://host:port`. One proxy per line.
-     - You can generate this file using the `getproxies.py` script.
+   - **`proxies.txt` (optional):** A list of proxies in the format `protocol://user:pass@host:port`. One proxy per line.
 
-2. **Generate Proxy List (Optional):**
-   - Run `getproxies.py` to download and save free proxies:
-
-     ```bash
-     python getproxies.py
-     ```
-   - This will save the proxy list to `proxies.txt` in the current directory.
-
-3. **Run the Script:**
+2. **Run the Script:**
 ```bash
 python main.py
 ```
@@ -91,6 +81,14 @@ python main.py
 ### Optional:
 - Choose whether to use proxies when prompted.
 - View real-time logs in the terminal, including ping successes, failures, and connection states.
+
+## Need Proxy?
+1. Sign up at [Proxies.fo](https://app.proxies.fo/ref/d02516e7-56b3-9a1f-b7ca-1fb08669f7a6).
+2. Go to [Plans](https://app.proxies.fo/plans) and only purchase the "ISP plan" (Residential plans don’t work).
+3. Top up your balance, or you can directly buy a plan and pay with Crypto!
+4. Go to the Dashboard, select your ISP plan, and click "Generate Proxy."
+5. Set the proxy format to `protocol://username:password@hostname:port` and choose any number for the proxy count.
+6. Paste the proxies into `proxy.txt`.
 
 ---
 
