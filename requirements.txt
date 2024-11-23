@@ -1,0 +1,7 @@
+aiohttp
+asyncio
+cloudscraper
+colorama
+loguru
+proxies
+uuid
