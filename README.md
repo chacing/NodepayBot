@@ -1,15 +1,19 @@
 
-# Nodepay Ping Utility
+# NodepayBot - Ping Utility
 
-The Nodepay Ping Utility is an asynchronous Python-based tool designed to send ping requests to multiple API endpoints, with support for proxies. It features colored logging for tracking status and robust error handling for network issues.
+NodepayBot is a Python-based tool designed to automate tasks for the Nodepay service, featuring token and proxy management, API interaction, and connection monitoring. This bot makes use of asynchronous programming for efficient operations and ensures a smooth automation experience.
+
+---
 
 ## Features
 
-- **Asynchronous Processing:** Utilizes `asyncio` and `aiohttp` for parallel request handling.
-- **Proxy Support:** Option to use a proxy list from `proxies.txt`.
-- **Logging:** Provides colored logs using `loguru` and `colorama`.
-- **Randomized Ping Intervals:** Adds a random interval between each ping request.
-- **Error Handling:** Handles various network errors and provides detailed logs.
+- **Automated API Interactions**: Handles session initialization, pings, and connection states.
+- **Proxy Support**: Enables using proxies for improved security and anonymity.
+- **Token Management**: Reads and utilizes tokens for authenticated interactions.
+- **Logging**: Real-time and colorful logs powered by `loguru` for better debugging and monitoring.
+- **Customizable Settings**: Adjustable ping intervals and retry limits.
+
+---
 
 ## Get NP_TOKEN
 Retrieving `np_token`: A quick guide to find your `np_token`:
@@ -25,26 +29,48 @@ Retrieving `np_token`: A quick guide to find your `np_token`:
 - The value displayed is your `np_token`.
 - Save `np_token` to `tokens.txt`
 
-## Installation
+---
+
+## Requirements
+
+Ensure you have Python 3.8 or newer installed.
+
+Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Dependencies include:
+- [asyncio](https://pypi.org/project/asyncio/)
+- [aiohttp](https://docs.aiohttp.org/)
+- [fake_useragent](https://pypi.org/project/fake-useragent/)
+- [pyfiglet](https://pypi.org/project/pyfiglet/)
+- [termcolor](https://pypi.org/project/termcolor/)
+- [loguru](https://loguru.readthedocs.io/)
+- [requests](https://docs.python-requests.org/) (for `getproxies.py`)
+
+---
+
+## Setup
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/Enukio/Nodepay.git
+   git clone https://github.com/Enukio/NodepayBot.git
    ```
    ```bash
-   cd Nodepay
+   cd NodepayBot
    ```
 
-2. Ensure Python 3.7 or higher is installed, then install the dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Place your API tokens in a file named `tokens.txt` (one token per line).
+
+3. If using proxies, create a file named `proxy.txt` and list your proxies (one per line).
+
+---
 
 ## Usage
-
 1. **Prepare Configuration Files:**
    - **`tokens.txt`:** A list of tokens for API authentication. One token per line.
-   - **`proxies.txt` (optional):** A list of proxies in the format `http://user:password@host:port`. One proxy per line.
+   - **`proxies.txt` (optional):** A list of proxies in the format `type://user:password@host:port` or `type://host:port`. One proxy per line.
      - You can generate this file using the `getproxies.py` script.
 
 2. **Generate Proxy List (Optional):**
@@ -56,35 +82,25 @@ Retrieving `np_token`: A quick guide to find your `np_token`:
    - This will save the proxy list to `proxies.txt` in the current directory.
 
 3. **Run the Script:**
-   ```bash
-   python run.py
-   ```
+```bash
+python main.py
+```
 
-4. **Follow the Instructions:**
-   - The script will prompt you to choose whether to use proxies.
+### Optional:
+- Choose whether to use proxies when prompted.
+- View real-time logs in the terminal, including ping successes, failures, and connection states.
 
-## Script Overview
+---
 
-- **Constants:**
-  - `DOMAIN_API_ENDPOINTS`: Contains API endpoints to ping.
-  - `HEADERS`: Default headers for API requests.
-  
-- **Utility Functions:**
-  - `load_file`: Loads configuration files like `tokens.txt` and `proxies.txt`.
-  - `uuidv4`: Generates a unique UUID v4 for each request.
+## Configuration
 
-- **Async Functions:**
-  - `call`: Sends a POST request to an API endpoint.
-  - `ping`: Performs repeated ping requests to endpoints.
-  - `process_token`: Processes a single token with or without proxies.
-  - `main`: The main function to start the application.
+You can adjust the following parameters in the `main.py` file:
 
-## Dependencies
+- `PING_INTERVAL`: Interval between pings (in seconds).
+- `RETRIES_LIMIT`: Maximum retry attempts before declaring a failure.
+- API endpoints are specified in the `DOMAIN_API_ENDPOINTS` dictionary.
 
-- [aiohttp](https://docs.aiohttp.org/)
-- [loguru](https://loguru.readthedocs.io/)
-- [colorama](https://pypi.org/project/colorama/)
-- [requests](https://docs.python-requests.org/) (for `getproxies.py`)
+---
 
 ## License
 
