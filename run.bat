@@ -26,6 +26,6 @@ if %errorlevel% neq 0 (
 
 REM Run the main script
 echo Running NodePay Ping Utility...
-python run.py
+python main.py
 
 pause
