@@ -1,7 +1,9 @@
 aiohttp
 asyncio
-fake_useragent
+cloudscraper
+fake-useragent
 loguru
 proxies
 pyfiglet
+python-dateutil
 termcolor
