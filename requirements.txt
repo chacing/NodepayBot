@@ -1,7 +1,7 @@
 aiohttp
 asyncio
-cloudscraper
-colorama
+fake_useragent
 loguru
 proxies
-uuid
+pyfiglet
+termcolor
