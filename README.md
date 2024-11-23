@@ -11,6 +11,19 @@ The Nodepay Ping Utility is an asynchronous Python-based tool designed to send p
 - **Randomized Ping Intervals:** Adds a random interval between each ping request.
 - **Error Handling:** Handles various network errors and provides detailed logs.
 
+## Get NP_TOKEN
+Retrieving `np_token`: A quick guide to find your `np_token`:
+
+- Open the webpage in your browser.
+- Press `F12` or use `Ctrl + Shift + I` (Windows/Linux) / `Cmd + Option + I` (Mac) to open the developer console.
+- Go to the **Console** tab.
+- Enter the following command:
+
+     ```javascript
+     localStorage.getItem('np_token');
+     ```
+- The value displayed is your `np_token`.
+
 ## Installation
 
 1. Clone this repository:
