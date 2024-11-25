@@ -1,10 +1,10 @@
 @echo off
-REM Run the NodePay Ping Utility
+REM Run the NodepayBot - Ping Utility
 
 REM Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Python is not installed. Please install Python 3.7 or higher.
+    echo Python is not installed. Please install Python 3.8 or higher.
     pause
     exit /b
 )
