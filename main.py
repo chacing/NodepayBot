@@ -159,17 +159,10 @@ async def send_ping(proxy, token):
         response = await send_request(DOMAIN_API_ENDPOINTS["PING"][0], data, proxy, token)
         if response["code"] == 0:
             ip_address = HIDE_PROXY if not proxy else re.search(r'(?<=@)[^:]+', proxy).group()
-            total_points_earned = response["data"].get("points", 0)  # Assuming 'points' is the key in the API response
             if proxy:
-                logger.success(
-                    f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, "
-                    f"Proxy: <yellow>{ip_address}</yellow>, Total Points Earned: <blue>{total_points_earned}</blue>"
-                )
+                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <yellow>{ip_address}</yellow>")
             else:
-                logger.success(
-                    f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, "
-                    f"IP: <yellow>{ip_address}</yellow>, Total Points Earned: <blue>{total_points_earned}</blue>"
-                )
+                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP: <yellow>{ip_address}</yellow>")
             RETRIES_LIMIT = 0
             status_connect = CONNECTION_STATES["CONNECTED"]
         else:
