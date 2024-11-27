@@ -177,7 +177,7 @@ def handle_ping_failure(proxy, response):
         handle_logout(proxy)
     else:
         if proxy:
-            logger.error(f"<yellow>Ping Failed</yellow>, Proxy: <yellow>{HIDE_PROXY}</yellow>")
+            logger.error(f"<yellow>Ping Failed</yellow>, Proxy Auth: <yellow>{HIDE_PROXY}</yellow>")
         else:
             logger.error(f"<yellow>Ping Failed</yellow>, IP: <yellow>{HIDE_PROXY}</yellow>")
         remove_proxy(proxy)
