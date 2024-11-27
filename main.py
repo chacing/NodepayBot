@@ -132,7 +132,7 @@ async def send_request(url, payload, proxy, token):
                 return await response.json()
         except Exception as e:
             error_code = getattr(e, 'status', 'Unknown')
-            logger.error(f"<yellow>API Request Failed: {error_code}</yellow>")
+            logger.error(f"<yellow>API Request Failed: {e.status}, Message: {e.message}</yellow>")
             raise ValueError(f"API request failed")
 
 async def start_ping_loop(proxy, token):
