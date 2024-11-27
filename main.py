@@ -7,27 +7,24 @@ import uuid
 from fake_useragent import UserAgent
 from loguru import logger
 import aiohttp
-import pyfiglet
 from pyfiglet import figlet_format
 from termcolor import colored
 
+# Konfigurasi logger
 logger.remove()
 logger.add(
     sink=sys.stdout,
     format="<r>[Nodepay]</r> | <white>{time:YYYY-MM-DD HH:mm:ss}</white> | "
            "<level>{level: <7}</level> | <cyan>{line: <3}</cyan> | {message}",
-colorize=True
-
+    colorize=True,
+    level="DEBUG"
 )
-logger = logger.opt(colors=True)
 
+# Header aplikasi
 def print_header():
     ascii_art = figlet_format("NodepayBot", font="slant")
-    
     colored_art = colored(ascii_art, color="cyan")
-    
     border = "=" * 60
-    
     print(border)
     print(colored_art)
     print("Welcome to NodepayBot - Automate your tasks effortlessly!")
@@ -35,6 +32,7 @@ def print_header():
 
 print_header()
 
+# Fungsi membaca token dan proxy
 def read_tokens_and_proxy():
     with open('tokens.txt', 'r') as file:
         tokens_content = sum(1 for line in file)
@@ -52,12 +50,11 @@ print(f"Nodepay only supports 3 connections per account. Using too many proxies 
 print()
 print("=" * 60)
 
-
 HIDE_PROXY = "[HIDDEN]"
 PING_INTERVAL = 1
 RETRIES_LIMIT = 60
 
-# API Endpoints
+# Endpoint API
 DOMAIN_API_ENDPOINTS = {
     "SESSION": [
         "https://api.nodepay.ai/api/auth/session"
@@ -78,6 +75,7 @@ browser_id = None
 account_info = {}
 last_ping_time = {}
 
+# Fungsi utilitas
 def generate_uuid():
     return str(uuid.uuid4())
 
@@ -85,33 +83,6 @@ def validate_response(response):
     if not response or "code" not in response or response["code"] < 0:
         raise ValueError("Invalid response received from the server.")
     return response
-
-async def initialize_profile(proxy, token):
-    global browser_id, account_info
-    try:
-        session_info = load_session_info(proxy)
-
-        if not session_info:
-            browser_id = generate_uuid()
-            response = await send_request(DOMAIN_API_ENDPOINTS["SESSION"][0], {}, proxy, token)
-            validate_response(response)
-            account_info = response["data"]
-
-            if account_info.get("uid"):
-                save_session_info(proxy, account_info)
-                await start_ping_loop(proxy, token)
-            else:
-                handle_logout(proxy)
-        else:
-            account_info = session_info
-            await start_ping_loop(proxy, token)
-    except Exception as e:
-        error_message = str(e)
-        if "keepalive ping timeout" in error_message or "500 Internal Server Error" in error_message:
-            remove_proxy(proxy)
-        else:
-            logger.error(f"Error: {error_message}")
-            return proxy
 
 async def send_request(url, payload, proxy, token):
     headers = {
@@ -131,19 +102,24 @@ async def send_request(url, payload, proxy, token):
                 response.raise_for_status()
                 return await response.json()
         except Exception as e:
-            error_code = getattr(e, 'status', 'Unknown')
-            logger.error(f"<yellow>API Request Failed: {e.status}, Message: {e.message}</yellow>")
-            raise ValueError(f"API request failed")
+            logger.error(f"<yellow>API Request Failed: {str(e)}</yellow>")
+            raise
 
-async def start_ping_loop(proxy, token):
+async def initialize_profile(proxy, token):
+    global browser_id, account_info
     try:
-        while True:
-            await send_ping(proxy, token)
-            await asyncio.sleep(PING_INTERVAL)
-    except asyncio.CancelledError:
-        pass
-    except Exception:
-        pass
+        browser_id = generate_uuid()
+        response = await send_request(DOMAIN_API_ENDPOINTS["SESSION"][0], {}, proxy, token)
+        validate_response(response)
+
+        account_info = response.get("data", {})
+        account_info["username"] = account_info.get("username", "Unknown User")
+
+        logger.info(f"<green>Session initialized for User: {account_info['username']}</green>")
+        await start_ping_loop(proxy, token)
+    except Exception as e:
+        logger.error(f"Error initializing profile: {str(e)}")
+        raise
 
 async def send_ping(proxy, token):
     global last_ping_time, RETRIES_LIMIT, status_connect
@@ -157,38 +133,44 @@ async def send_ping(proxy, token):
         }
 
         response = await send_request(DOMAIN_API_ENDPOINTS["PING"][0], data, proxy, token)
-        if response["code"] == 0:
-            ip_address = HIDE_PROXY if not proxy else re.search(r'(?<=@)[^:]+', proxy).group()
-            if proxy:
-                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <yellow>{ip_address}</yellow>")
-            else:
-                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP: <yellow>{ip_address}</yellow>")
-            RETRIES_LIMIT = 0
-            status_connect = CONNECTION_STATES["CONNECTED"]
+        validate_response(response)
+
+        ip_address = re.search(r'(?<=@)[^:]+', proxy).group() if proxy else "No Proxy"
+        ip_score = response['data'].get('ip_score', 'Unknown')
+        user = account_info.get("username", "Unknown User")  # Pastikan data username diisi
+
+        if proxy:
+            logger.success(
+                f"<green>Ping Successful</green>, User: <white>{user}</white>, "
+                f"IP Score: <cyan>{ip_score}</cyan>, Proxy: <yellow>{ip_address}</yellow>"
+            )
         else:
-            handle_ping_failure(proxy, response)
-    except Exception:
-        handle_ping_failure(proxy, None)
+            logger.success(
+                f"<green>Ping Successful</green>, User: <white>{user}</white>, "
+                f"IP Score: <cyan>{ip_score}</cyan>, IP: <yellow>{ip_address}</yellow>"
+            )
 
-def handle_ping_failure(proxy, response):
-    global RETRIES_LIMIT, status_connect
-    RETRIES_LIMIT += 1
-    ip_address = HIDE_PROXY if not proxy else re.search(r'(?<=@)[^:]+', proxy).group()
-    error_message = response.get("message") if response else "No response from server"
+        RETRIES_LIMIT = 0  # Reset retry limit jika berhasil
+        status_connect = CONNECTION_STATES["CONNECTED"]
 
-    if response and response.get("code") == 403:
-        handle_logout(proxy)
-        logger.warning(f"<yellow>Ping Failed: Unauthorized Access</yellow>, Proxy: <yellow>{ip_address}</yellow>")
-    else:
-        logger.error(f"<yellow>Ping Failed</yellow>, Proxy: <yellow>{ip_address}</yellow>, Reason: {error_message}")
-        remove_proxy(proxy)
-        status_connect = CONNECTION_STATES["DISCONNECTED"]
+    except Exception as e:
+        RETRIES_LIMIT += 1
+        logger.error(f"<red>Ping failed:</red> {str(e)}")
+        if RETRIES_LIMIT > 10:
+            logger.error(f"Max retry limit reached. Removing Proxy: {proxy}.")
+            remove_proxy(proxy)
+            status_connect = CONNECTION_STATES["DISCONNECTED"]
 
-def handle_logout(proxy):
-    global status_connect, account_info
-    status_connect = CONNECTION_STATES["NO_CONNECTION"]
-    account_info = {}
-    save_status(proxy, None)
+async def start_ping_loop(proxy, token):
+    try:
+        while True:
+            await send_ping(proxy, token)
+            await asyncio.sleep(PING_INTERVAL)
+    except asyncio.CancelledError:
+        pass
+
+def remove_proxy(proxy):
+    logger.warning(f"Removing Proxy: {proxy}")
 
 def load_proxies(file_path):
     try:
@@ -198,27 +180,8 @@ def load_proxies(file_path):
         logger.error(f"Failed to load proxy list. Exiting.")
         raise SystemExit()
 
-def save_session_info(proxy, data):
-    pass
-
-def load_session_info(proxy):
-    return {}
-
-def remove_proxy(proxy):
-    pass
-
-def ask_user_for_proxy():
-    user_input = ""
-    while user_input not in ['yes', 'no']:
-        user_input = input("Do you want to use proxy? (yes/no)? ").strip().lower()
-        if user_input not in ['yes', 'no']:
-            print("Invalid input. Please enter 'yes' or 'no'.")
-    print(f"You selected: {'Yes' if user_input == 'yes' else 'No'}, ENJOY!\n")
-    return user_input == 'yes'
-
 async def main():
-    use_proxy = ask_user_for_proxy()
-
+    use_proxy = True  # Ubah sesuai kebutuhan
     proxies = load_proxies('proxy.txt') if use_proxy else []
 
     try:
@@ -236,17 +199,9 @@ async def main():
 
     tasks = [asyncio.create_task(initialize_profile(proxy, token)) for token, proxy in token_proxy_pairs]
 
-    while True:
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        for result in results:
-            if isinstance(result, Exception):
-                logger.error(f"Task encountered an error")
-            else:
-                logger.success(f"Task completed successfully")
+    await asyncio.gather(*tasks)
 
-        await asyncio.sleep(10)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
