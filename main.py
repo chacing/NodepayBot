@@ -1,12 +1,13 @@
-import aiohttp
 import asyncio
-import pyfiglet
 import re
 import sys
 import time
 import uuid
+
 from fake_useragent import UserAgent
 from loguru import logger
+import aiohttp
+import pyfiglet
 from pyfiglet import figlet_format
 from termcolor import colored
 
