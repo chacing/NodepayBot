@@ -162,7 +162,7 @@ async def send_ping(proxy, token):
             if proxy:
                 logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <yellow>{ip_address}</yellow>")
             else:
-                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP: <yellow>{ip_address}</yellow>")
+                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP Address: <yellow>{ip_address}</yellow>")
             RETRIES_LIMIT = 0
             status_connect = CONNECTION_STATES["CONNECTED"]
         else:
