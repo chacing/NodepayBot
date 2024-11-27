@@ -173,13 +173,14 @@ async def send_ping(proxy, token):
 def handle_ping_failure(proxy, response):
     global RETRIES_LIMIT, status_connect
     RETRIES_LIMIT += 1
+    ip_address = HIDE_PROXY if not proxy else re.search(r'(?<=@)[^:]+', proxy).group()
+    error_message = response.get("message") if response else "No response from server"
+
     if response and response.get("code") == 403:
         handle_logout(proxy)
+        logger.warning(f"<yellow>Ping Failed: Unauthorized Access</yellow>, Proxy: <yellow>{ip_address}</yellow>")
     else:
-        if proxy:
-            logger.error(f"<yellow>Ping Failed</yellow>, Proxy Auth: <yellow>{HIDE_PROXY}</yellow>")
-        else:
-            logger.error(f"<yellow>Ping Failed</yellow>, IP: <yellow>{HIDE_PROXY}</yellow>")
+        logger.error(f"<yellow>Ping Failed</yellow>, Proxy: <yellow>{ip_address}</yellow>, Reason: {error_message}")
         remove_proxy(proxy)
         status_connect = CONNECTION_STATES["DISCONNECTED"]
 
