@@ -105,22 +105,6 @@ async def send_request(url, payload, proxy, token):
             logger.error(f"<yellow>API Request Failed: {str(e)}</yellow>")
             raise
 
-async def initialize_profile(proxy, token):
-    global browser_id, account_info
-    try:
-        browser_id = generate_uuid()
-        response = await send_request(DOMAIN_API_ENDPOINTS["SESSION"][0], {}, proxy, token)
-        validate_response(response)
-
-        account_info = response.get("data", {})
-        account_info["username"] = account_info.get("username", "Unknown User")
-
-        logger.info(f"<green>Session initialized for User: {account_info['username']}</green>")
-        await start_ping_loop(proxy, token)
-    except Exception as e:
-        logger.error(f"Error initializing profile: {str(e)}")
-        raise
-
 async def send_ping(proxy, token):
     global last_ping_time, RETRIES_LIMIT, status_connect
     last_ping_time[proxy] = time.time()
@@ -135,53 +119,49 @@ async def send_ping(proxy, token):
         response = await send_request(DOMAIN_API_ENDPOINTS["PING"][0], data, proxy, token)
         validate_response(response)
 
-        ip_address = re.search(r'(?<=@)[^:]+', proxy).group() if proxy else "No Proxy"
-        ip_score = response['data'].get('ip_score', 'Unknown')
-        user = account_info.get("username", "Unknown User")  # Pastikan data username diisi
-
-        if proxy:
-            logger.success(
-                f"<green>Ping Successful</green>, User: <white>{user}</white>, "
-                f"IP Score: <cyan>{ip_score}</cyan>, Proxy: <yellow>{ip_address}</yellow>"
-            )
-        else:
-            logger.success(
-                f"<green>Ping Successful</green>, User: <white>{user}</white>, "
-                f"IP Score: <cyan>{ip_score}</cyan>, IP: <yellow>{ip_address}</yellow>"
-            )
-
+        ip_address = re.search(r'(?<=@)[^:]+', proxy).group() if proxy else HIDE_PROXY
+        logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <yellow>{ip_address}</yellow>")
+        
         RETRIES_LIMIT = 0  # Reset retry limit jika berhasil
         status_connect = CONNECTION_STATES["CONNECTED"]
 
-    except Exception as e:
+    except aiohttp.ClientError as e:
         RETRIES_LIMIT += 1
-        logger.error(f"<red>Ping failed:</red> {str(e)}")
+        logger.error(f"<red>Ping failed due to network error</red>: {e}")
+        if RETRIES_LIMIT > 10:
+            logger.error(f"Max retry limit reached. Removing Proxy: {proxy}.")
+            remove_proxy(proxy)
+            status_connect = CONNECTION_STATES["DISCONNECTED"]
+        else:
+            logger.warning(f"<yellow>Retrying Ping... Attempt {RETRIES_LIMIT}/10</yellow>")
+    
+    except asyncio.TimeoutError:
+        RETRIES_LIMIT += 1
+        logger.warning(f"<yellow>Ping timeout. Retrying... Attempt {RETRIES_LIMIT}/10</yellow>")
+        if RETRIES_LIMIT > 10:
+            logger.error(f"Max retry limit reached. Removing Proxy: {proxy}.")
+            remove_proxy(proxy)
+            status_connect = CONNECTION_STATES["DISCONNECTED"]
+    
+    except ValueError as ve:
+        RETRIES_LIMIT += 1
+        logger.error(f"<red>Invalid response during ping</red>: {ve}")
         if RETRIES_LIMIT > 10:
             logger.error(f"Max retry limit reached. Removing Proxy: {proxy}.")
             remove_proxy(proxy)
             status_connect = CONNECTION_STATES["DISCONNECTED"]
 
-async def start_ping_loop(proxy, token):
-    try:
-        while True:
-            await send_ping(proxy, token)
-            await asyncio.sleep(PING_INTERVAL)
-    except asyncio.CancelledError:
-        pass
-
-def remove_proxy(proxy):
-    logger.warning(f"Removing Proxy: {proxy}")
-
-def load_proxies(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            return file.read().splitlines()
-    except Exception:
-        logger.error(f"Failed to load proxy list. Exiting.")
-        raise SystemExit()
+    except Exception as e:
+        RETRIES_LIMIT += 1
+        logger.error(f"<red>Unexpected error during ping</red>: {e}")
+        if RETRIES_LIMIT > 10:
+            logger.error(f"Max retry limit reached. Removing Proxy: {proxy}.")
+            remove_proxy(proxy)
+            status_connect = CONNECTION_STATES["DISCONNECTED"]
 
 async def main():
-    use_proxy = True  # Ubah sesuai kebutuhan
+    use_proxy = ask_user_for_proxy()
+
     proxies = load_proxies('proxy.txt') if use_proxy else []
 
     try:
@@ -199,7 +179,15 @@ async def main():
 
     tasks = [asyncio.create_task(initialize_profile(proxy, token)) for token, proxy in token_proxy_pairs]
 
-    await asyncio.gather(*tasks)
+    while True:
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for result in results:
+            if isinstance(result, Exception):
+                logger.error(f"Task encountered an error")
+            else:
+                logger.success(f"Task completed successfully")
+
+        await asyncio.sleep(10)
 
 if __name__ == "__main__":
     try:
