@@ -186,7 +186,7 @@ def handle_ping_failure(proxy, response):
         handle_logout(proxy)
         logger.warning(f"<yellow>Ping Failed: Unauthorized Access</yellow>, Proxy: <yellow>{ip_address}</yellow>")
     else:
-        logger.error(f"<yellow>Ping Failed</yellow>, Proxy: <yellow>{ip_address}</yellow>, Reason: {error_message}")
+        logger.error(f"<yellow>Ping Failed</yellow>, Reason: {error_message}, Proxy: <yellow>{ip_address}</yellow>")
         remove_proxy(proxy)
         status_connect = CONNECTION_STATES["DISCONNECTED"]
 
