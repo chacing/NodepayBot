@@ -166,9 +166,9 @@ async def send_ping(proxy, token):
         if response["code"] == 0:
             ip_address = HIDE_PROXY if not proxy else re.search(r'(?<=@)[^:]+', proxy).group()
             if proxy:
-                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <yellow>{ip_address}</yellow>")
+                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, Proxy: <cyan>{ip_address}</cyan>")
             else:
-                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP Address: <yellow>{ip_address}</yellow>")
+                logger.success(f"<green>Ping Successful</green>, IP Score: <cyan>{response['data'].get('ip_score')}</cyan>, IP Address: <cyan>{ip_address}</cyan>")
             RETRIES_LIMIT = 0
             status_connect = CONNECTION_STATES["CONNECTED"]
         else:
@@ -184,9 +184,9 @@ def handle_ping_failure(proxy, response):
 
     if response and response.get("code") == 403:
         handle_logout(proxy)
-        logger.warning(f"<yellow>Ping Failed: Unauthorized Access</yellow>, Proxy: <yellow>{ip_address}</yellow>")
+        logger.warning(f"<yellow>Ping Failed: Unauthorized Access</yellow>, Proxy: <cyan>{ip_address}</cyan>")
     else:
-        logger.error(f"<yellow>Ping Failed</yellow>, Reason: {error_message}, Proxy: <yellow>{ip_address}</yellow>")
+        logger.error(f"<yellow>Ping Failed</yellow>, Reason: <yellow>{error_message}</yellow>, Proxy: <cyan>{ip_address}</cyan>")
         remove_proxy(proxy)
         status_connect = CONNECTION_STATES["DISCONNECTED"]
 
