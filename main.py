@@ -122,13 +122,7 @@ async def send_request(url, payload, proxy, token):
         "Accept-Language": "en-US,en;q=0.5",
         "Referer": "https://app.nodepay.ai",
         "Origin": "chrome-extension://lgmpfmgeabnnlemejacfljbmonaomfmm",
-        "X-Requested-With": "NodepayExtension",
-        "Sec-Ch-Ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
-        "Sec-Ch-Ua-Mobile": "?0",
-        "Sec-Ch-Ua-Platform": '"Windows"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "cors-site"
+        "X-Requested-With": "NodepayExtension"
     }
 
     async with aiohttp.ClientSession() as session:
