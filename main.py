@@ -117,12 +117,21 @@ async def send_request(url, payload, proxy, token):
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
-        "User-Agent": UserAgent().random,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
         "Accept": "application/json",
         "Accept-Language": "en-US,en;q=0.5",
         "Referer": "https://app.nodepay.ai",
-        "Origin": "chrome-extension://lgmpfmgeabnnlemejacfljbmonaomfmm",
-        "X-Requested-With": "NodepayExtension"
+        "Origin": "https://app.nodepay.ai",
+        "X-Requested-With": "NodepayExtension",
+        "Sec-Ch-Ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-site",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache"
     }
 
     async with aiohttp.ClientSession() as session:
