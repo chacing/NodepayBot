@@ -1,31 +1,41 @@
 @echo off
-REM Run the NodepayBot - Ping Utility
 
-REM Check if Python is installed
+:: Check if Python is available
 python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Python is not installed. Please install Python 3.8 or higher.
+if errorlevel 1 (
+    echo Python is not installed. Please install Python first.
     pause
     exit /b
 )
 
-REM Check if dependencies are installed by testing 'requests' package
-python -c "import requests" >nul 2>&1
-if %errorlevel% neq 0 (
-    REM Install required dependencies if 'requests' is not found
-    echo Installing required dependencies...
-    pip install -r requirements.txt
-    if %errorlevel% neq 0 (
-        echo Failed to install dependencies. Please check your Python and pip setup.
-        pause
-        exit /b
-    )
-) else (
-    echo Dependencies are already installed. Skipping installation.
+:: Create a virtual environment if it does not exist
+if not exist venv (
+    echo Creating virtual environment...
+    python -m venv venv
 )
 
-REM Run the main script
-echo Running NodepayBot...
+:: Activate the virtual environment
+echo Activating virtual environment...
+call venv\Scripts\activate
+
+:: Install dependencies if they are not already installed
+if not exist venv\Lib\site-packages\installed (
+    if exist requirements.txt (
+        echo Installing wheel for faster installation
+        pip install wheel
+        echo Installing dependencies...
+        pip install -r requirements.txt
+        echo. > venv\Lib\site-packages\installed
+    ) else (
+        echo requirements.txt not found, skipping dependency installation.
+    )
+) else (
+    echo Dependencies are already installed, skipping installation.
+)
+
+:: Start the bot
+echo Starting the bot...
 python main.py
 
+echo Done
 pause
