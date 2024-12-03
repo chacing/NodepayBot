@@ -122,37 +122,40 @@ async def call_api(url, data, token, proxy=None):
     user_agent = UserAgent().chrome if UserAgent().chrome else "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
     sec_ch_ua_version = user_agent.split("Chrome/")[-1].split(" ")[0]
     headers = {
-            "Authorization": f"Bearer {token}",
-            "User-Agent": user_agent,
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer": "https://app.nodepay.ai/",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Origin": "chrome-extension://lgmpfmgeabnnlemejacfljbmonaomfmm",
-            "Sec-Ch-Ua": f'"Chromium";v="{sec_ch_ua_version}", "Google Chrome";v="{sec_ch_ua_version}", "Not?A_Brand";v="99"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Windows"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "DNT": "1",
-            "Connection": "keep-alive",
-            "Cache-Control": "no-cache",
+        "Authorization": f"Bearer {token}",
+        "User-Agent": user_agent,
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://app.nodepay.ai/",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Origin": "chrome-extension://lgmpfmgeabnnlemejacfljbmonaomfmm",
+        "Sec-Ch-Ua": f'"Chromium";v="{sec_ch_ua_version}", "Google Chrome";v="{sec_ch_ua_version}", "Not?A_Brand";v="99"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Cache-Control": "no-cache",
     }
 
     proxies = {"http": proxy, "https": proxy} if proxy else None
-    response = None
     try:
         response = requests.post(url, json=data, headers=headers, proxies=proxies, impersonate="chrome110", timeout=30)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.HTTPError:
+    except requests.exceptions.SSLError:
+        logger.error("Error during API call: SSL Error")
         return None
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Error during API call: {repr(e)}")
+    except requests.exceptions.ConnectionError:
+        logger.error("Error during API call: Connection Error")
         return None
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {repr(e)}")
+    except requests.exceptions.RequestException:
+        logger.error("Error during API call: Request Error")
+        return None
+    except json.JSONDecodeError:
+        logger.error("Error during API call: JSON Decode Error")
         return None
 
 def get_ip_address():
