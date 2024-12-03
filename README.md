@@ -95,6 +95,33 @@ You can adjust the following parameters in the `main.py` file:
 - API endpoints are specified in the `DOMAIN_API_ENDPOINTS` dictionary.
 
 ---
+## Fix Termux Error
+- Copy [libcurl-impersonate-chrome.so.4](https://github.com/Enukio/NodepayBot/raw/refs/heads/main/libcurl-impersonate-chrome.so.4) To Folder /data/data/com.termux/files/usr/lib
+- Example Command On Termux :
+```bash
+cp libcurl-impersonate-chrome.so.4 /data/data/com.termux/files/usr/lib
+```
+Make Sure Allowed Permission Storage On Setting Termux
+- Install Python 3.10
+```bash
+pkg update && upgrade
+pkg install tur-repo
+pkg install python-is-python3.10
+```
+- Install Requirements
+```bash
+pip install --upgrade pip
+pkg install -y rust binutils
+CARGO_BUILD_TARGET="$(rustc -Vv | grep "host" | awk '{print $2}')" pip install maturin
+pip install asyncio
+pip install requests
+pip install curl-cffi
+pip install fake-useragent
+pip install loguru
+pip install pyfiglet
+pip install termcolor
+```
+---
 
 ## License
 
