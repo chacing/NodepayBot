@@ -151,10 +151,10 @@ async def call_api(url, data, token, proxy=None):
     except requests.exceptions.ConnectionError:
         logger.error("Error during API call: Connection Error")
         return None
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
         logger.error("Error during API call: Request Error")
         return None
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         logger.error("Error during API call: JSON Decode Error")
         return None
 
