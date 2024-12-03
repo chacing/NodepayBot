@@ -24,6 +24,9 @@ CONNECTION_STATES = {
     "NONE_CONNECTION": 3
 }
 
+# Global configuration
+SHOW_REQUEST_ERROR_LOG = False
+
 # Setup logger
 logger.remove()
 logger.add(
@@ -146,16 +149,20 @@ async def call_api(url, data, token, proxy=None):
         response.raise_for_status()
         return response.json()
     except requests.exceptions.SSLError:
-        logger.error("Error during API call: SSL Error")
+        if SHOW_REQUEST_ERROR_LOG:
+            logger.error("Error during API call: SSL Error")
         return None
     except requests.exceptions.ConnectionError:
-        logger.error("Error during API call: Connection Error")
+        if SHOW_REQUEST_ERROR_LOG:
+            logger.error("Error during API call: Connection Error")
         return None
-    except requests.exceptions.RequestException as e:
-        logger.error("Error during API call: Request Error")
+    except requests.exceptions.RequestException:
+        if SHOW_REQUEST_ERROR_LOG:
+            logger.error("Error during API call: Request Error")
         return None
-    except json.JSONDecodeError as e:
-        logger.error("Error during API call: JSON Decode Error")
+    except json.JSONDecodeError:
+        if SHOW_REQUEST_ERROR_LOG:
+            logger.error("Error during API call: JSON Decode Error")
         return None
 
 def get_ip_address():
