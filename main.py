@@ -37,7 +37,7 @@ logger = logger.opt(colors=True)
 def print_header():
     ascii_art = figlet_format("NodepayBot", font="slant")
     colored_art = colored(ascii_art, color="cyan")
-    border = "=" * 40
+    border = "=" * 60
     
     print(border)
     print(colored_art)
@@ -61,7 +61,7 @@ print()
 print(f"Tokens: {tokens_content} - Loaded {proxy_count} proxies\n")
 print(f"Nodepay only supports 3 connections per account. Using too many proxies may cause issues.")
 print()
-print("=" * 40)
+print("=" * 60)
 
 # Proxy utility
 def ask_user_for_proxy():
