@@ -1,8 +1,7 @@
-aiohttp
 asyncio
-cloudscraper
+requests
+curl-cffi
 fake-useragent
 loguru
 pyfiglet
-python-dateutil
 termcolor
