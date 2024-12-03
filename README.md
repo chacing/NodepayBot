@@ -53,12 +53,11 @@ pip install -r requirements.txt
 
 Dependencies include:
 - [asyncio](https://pypi.org/project/asyncio/)
-- [aiohttp](https://docs.aiohttp.org/)
-- [cloudscraper](https://pypi.org/project/cloudscraper/)
+- [requests](https://pypi.org/project/requests/)
+- [curl-cffi](https://pypi.org/project/curl-cffi/)
 - [fake-useragent](https://pypi.org/project/fake-useragent/)
 - [loguru](https://loguru.readthedocs.io/)
 - [pyfiglet](https://pypi.org/project/pyfiglet/)
-- [python-dateutil](https://pypi.org/project/python-dateutil/)
 - [termcolor](https://pypi.org/project/termcolor/)
 
 ---
